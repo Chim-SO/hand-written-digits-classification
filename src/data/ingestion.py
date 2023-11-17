@@ -1,30 +1,24 @@
-# -*- coding: utf-8 -*-
-import click
-import logging
-from pathlib import Path
-from dotenv import find_dotenv, load_dotenv
+import argparse
+import os.path
+import urllib.request
 
 
-@click.command()
-@click.argument('input_filepath', type=click.Path(exists=True))
-@click.argument('output_filepath', type=click.Path())
-def main(input_filepath, output_filepath):
-    """ Runs data processing scripts to turn raw data from (../raw) into
-        cleaned data ready to be analyzed (saved in ../processed).
-    """
-    logger = logging.getLogger(__name__)
-    logger.info('making final data set from raw data')
+def download_raw_data(raw_data_path):
+    train_images_url = 'http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz'
+    train_labels_url = 'http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz'
+    test_images_url = 'http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz'
+    test_labels_url = 'http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz'
+
+    # Download the MNIST dataset
+    urllib.request.urlretrieve(train_images_url, os.path.join(raw_data_path, 'train_images.gz'))
+    urllib.request.urlretrieve(train_labels_url, os.path.join(raw_data_path, 'train_labels.gz'))
+    urllib.request.urlretrieve(test_images_url, os.path.join(raw_data_path, 'test_images.gz'))
+    urllib.request.urlretrieve(test_labels_url, os.path.join(raw_data_path, 'test_labels.gz'))
 
 
 if __name__ == '__main__':
-    log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    logging.basicConfig(level=logging.INFO, format=log_fmt)
+    parser = argparse.ArgumentParser(description="Download dataset")
+    parser.add_argument("-r", "--raw-path", help="Raw data path", required=True)
+    args = parser.parse_args()
 
-    # not used in this stub but often useful for finding various files
-    project_dir = Path(__file__).resolve().parents[2]
-
-    # find .env automagically by walking up directories until it's found, then
-    # load up the .env entries as environment variables
-    load_dotenv(find_dotenv())
-
-    main()
+    download_raw_data(args.raw_path)
