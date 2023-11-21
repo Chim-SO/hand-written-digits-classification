@@ -1,0 +1,5 @@
+outs:
+- md5: 9fb629c4189551a2d022fa330f9573f3
+  size: 1648877
+  hash: md5
+  path: test_images.gz

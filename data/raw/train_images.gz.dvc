@@ -1,0 +1,5 @@
+outs:
+- md5: f68b3c2dcbeaaa9fbdd348bbdeb94873
+  size: 9912422
+  hash: md5
+  path: train_images.gz
