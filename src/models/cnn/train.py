@@ -27,7 +27,7 @@ def eval_metrics(actual, pred):
     return acc, precision, recall, f1
 
 
-def train(data_path, epochs, batch_size):
+def train(data_path, epochs, batch_size, model_name, output_path):
     # Read dataset:
     x_train, y_train = load_data(os.path.join(data_path, 'train.csv'))
     # Scaling:
@@ -45,7 +45,6 @@ def train(data_path, epochs, batch_size):
     # Log parameters:
     metric = 'accuracy'
     loss = 'categorical_crossentropy'
-    metric = 'accuracy'
 
     # Train:
     model.compile(loss=loss, optimizer='adam', metrics=[metric])
@@ -69,6 +68,30 @@ def train(data_path, epochs, batch_size):
 
     acc, precision, recall, f1 = eval_metrics(np.argmax(y_test, axis=1), y_pred)
 
+    # Save model:
+    model.save_weights(os.path.join(output_path, model_name + ".h5"))
+    # Save metrics:
+    with open(os.path.join(output_path, model_name + '.yaml'), 'w') as f:
+        yaml.dump(
+            {
+                'params': {
+                    'loss': loss,
+                    'metric': metric,
+                    'epochs': epochs,
+                    'batch_size': batch_size
+                },
+                'metrics': {
+                    'acc': acc,
+                    'precision': precision,
+                    'recall': recall,
+                    'f1': f1,
+                    'training_loss': history.history['loss'],
+                    'training_acc': history.history['accuracy'],
+                    'val_loss': history.history['val_loss'],
+                    'val_acc': history.history['val_accuracy']
+                }
+            }, f, default_flow_style=False)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Train a Keras CNN-based model for MNIST classification")
@@ -82,4 +105,4 @@ if __name__ == '__main__':
     # Get parameters:
     data_path = config['data']['dataset_path']
     train(data_path, config['training']['num_epochs'],
-          config['training']['batch_size'])
+          config['training']['batch_size'], config['model_name'], config['training']['output_path'])
