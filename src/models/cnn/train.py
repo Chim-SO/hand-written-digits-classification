@@ -2,9 +2,11 @@ import argparse
 import os.path
 import random
 
+import mlflow.keras
 import numpy as np
 import tensorflow as tf
 import yaml
+from mlflow.models.signature import infer_signature
 from numpy.random import seed
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.model_selection import train_test_split
@@ -43,8 +45,8 @@ def train(data_path, epochs, batch_size, model_name, output_path):
     model = create_model(x_train[0].shape)
 
     # Log parameters:
-    metric = 'accuracy'
     loss = 'categorical_crossentropy'
+    metric = 'accuracy'
 
     # Train:
     model.compile(loss=loss, optimizer='adam', metrics=[metric])
@@ -68,10 +70,8 @@ def train(data_path, epochs, batch_size, model_name, output_path):
 
     acc, precision, recall, f1 = eval_metrics(np.argmax(y_test, axis=1), y_pred)
 
-    # Save model:
-    model.save_weights(os.path.join(output_path, model_name + ".h5"))
     # Save metrics:
-    with open(os.path.join(output_path, model_name + '.yaml'), 'w') as f:
+    with open(os.path.join(output_path, output_path + '.yaml'), 'w') as f:
         yaml.dump(
             {
                 'params': {
@@ -92,6 +92,10 @@ def train(data_path, epochs, batch_size, model_name, output_path):
                 }
             }, f, default_flow_style=False)
 
+    # Save model:
+    signature = infer_signature(x_train, y_train)
+    mlflow.tensorflow.log_model(model, output_path, signature=signature)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Train a Keras CNN-based model for MNIST classification")
@@ -104,5 +108,10 @@ if __name__ == '__main__':
 
     # Get parameters:
     data_path = config['data']['dataset_path']
-    train(data_path, config['training']['num_epochs'],
-          config['training']['batch_size'], config['model_name'], config['training']['output_path'])
+
+    # MLflow setup
+    mlflow.set_experiment(config['mlflow']['experiment_name'])
+
+    with mlflow.start_run():
+        train(data_path, config['training']['num_epochs'],
+              config['training']['batch_size'], config['model_name'], config['training']['output_path'])
