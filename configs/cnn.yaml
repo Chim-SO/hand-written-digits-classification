@@ -1,0 +1,17 @@
+# Configuration file for deep learning model
+# ------------------------------
+# Data parameters
+model_name: 'cnn'
+data:
+  dataset_path: 'data/processed/'
+
+# Training parameters
+training:
+  batch_size: 128
+  num_epochs: 15
+  output_path: 'models/'
+
+# Grid search:
+hyperparameter_tuning:
+  batch_size: [ 128, 256 ]
+  num_epochs: [ 10, 15, 20 ]
