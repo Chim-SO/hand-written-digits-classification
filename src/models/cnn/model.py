@@ -1,5 +1,5 @@
-from tensorflow.python.keras.layers import Dense, Dropout, Conv2D, MaxPooling2D, Flatten, InputLayer
-from tensorflow.python.keras.models import Sequential
+from keras.layers import Dense, Dropout, Conv2D, MaxPooling2D, Flatten, InputLayer
+from keras.models import Sequential
 
 
 def create_model(input_shape):
