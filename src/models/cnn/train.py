@@ -22,11 +22,10 @@ random.seed(2)
 
 
 def eval_metrics(actual, pred):
-    acc = round(accuracy_score(actual, pred, normalize=True) * 100, 2)
-    precision = round(precision_score(actual, pred, average='macro') * 100, 2)
-    recall = round(recall_score(actual, pred, average='macro') * 100, 2)
-    f1 = round(f1_score(actual, pred, average='macro') * 100, 2)
-    return acc, precision, recall, f1
+    return (float(accuracy_score(actual, pred, normalize=True)),
+            float(precision_score(actual, pred, average='macro')),
+            float(recall_score(actual, pred, average='macro')),
+            float(f1_score(actual, pred, average='macro')))
 
 
 def train(data_path, epochs, batch_size, model_name, output_path):
@@ -67,7 +66,6 @@ def train(data_path, epochs, batch_size, model_name, output_path):
 
     # Other metric evaluation:
     y_pred = np.argmax(model.predict(x_test), axis=1)
-
     acc, precision, recall, f1 = eval_metrics(np.argmax(y_test, axis=1), y_pred)
 
     # Save metrics:
@@ -85,12 +83,14 @@ def train(data_path, epochs, batch_size, model_name, output_path):
                     'precision': precision,
                     'recall': recall,
                     'f1': f1,
-                    'training_loss': history.history['loss'],
-                    'training_acc': history.history['accuracy'],
-                    'val_loss': history.history['val_loss'],
-                    'val_acc': history.history['val_accuracy']
+                    'training_loss': history.history['loss'][-1],
+                    'training_acc': history.history['accuracy'][-1],
+                    'val_loss': history.history['val_loss'][-1],
+                    'val_acc': history.history['val_accuracy'][-1],
+                    'test_loss': test_loss,
+                    'test_metric': test_metric
                 }
-            }, f, default_flow_style=False)
+            }, f)
 
     # Save model:
     signature = infer_signature(x_train, y_train)
