@@ -71,7 +71,7 @@ def train(data_path, epochs, batch_size, model_name, output_path):
     acc, precision, recall, f1 = eval_metrics(np.argmax(y_test, axis=1), y_pred)
 
     # Save metrics:
-    with open(os.path.join(output_path, output_path + '.yaml'), 'w') as f:
+    with open(os.path.join(output_path, model_name + '.yaml'), 'w') as f:
         yaml.dump(
             {
                 'params': {
