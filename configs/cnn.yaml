@@ -16,6 +16,8 @@ mlflow:
   mlruns_path: 'models'
   tracking_uri: 'http://localhost:8080'
   experiment_name: 'cnn'
+  tags :
+    v1.2 : 'CNN based model for MNIST data'
 
 # Grid search:
 hyperparameter_tuning:

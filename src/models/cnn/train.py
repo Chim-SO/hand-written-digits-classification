@@ -28,7 +28,7 @@ def eval_metrics(actual, pred):
             float(f1_score(actual, pred, average='macro')))
 
 
-def train(data_path, epochs, batch_size, model_name, output_path):
+def train(data_path, epochs, batch_size, output_path, tracking_uri, experiment_name, tags):
     # Read dataset:
     x_train, y_train = load_data(os.path.join(data_path, 'train.csv'))
     # Scaling:
@@ -68,36 +68,36 @@ def train(data_path, epochs, batch_size, model_name, output_path):
     y_pred = np.argmax(model.predict(x_test), axis=1)
     acc, precision, recall, f1 = eval_metrics(np.argmax(y_test, axis=1), y_pred)
 
-    # Save metrics:
-    with open(os.path.join(output_path, model_name + '.yaml'), 'w') as f:
-        yaml.dump(
-            {
-                'params': {
-                    'loss': loss,
-                    'metric': metric,
-                    'epochs': epochs,
-                    'batch_size': batch_size
-                },
-                'metrics': {
-                    'acc': acc,
-                    'precision': precision,
-                    'recall': recall,
-                    'f1': f1,
-                    'training_loss': history.history['loss'][-1],
-                    'training_acc': history.history['accuracy'][-1],
-                    'val_loss': history.history['val_loss'][-1],
-                    'val_acc': history.history['val_accuracy'][-1],
-                    'test_loss': test_loss,
-                    'test_metric': test_metric
-                }
-            }, f)
 
     # Set tracking server uri for logging
-    mlflow.set_tracking_uri(config['mlflow']['tracking_uri'])
+    mlflow.set_tracking_uri(tracking_uri)
     # Create an MLflow Experiment
-    mlflow.set_experiment(config['mlflow']['experiment_name'])
+    mlflow.set_experiment(experiment_name)
     # Start an MLflow run
     with mlflow.start_run():
+        # Log the hyperparameters
+        mlflow.log_params({
+            'loss': loss,
+            'metric': metric,
+            'epochs': epochs,
+            'batch_size': batch_size
+        })
+        # Log the metrics
+        mlflow.log_metrics({
+            'acc': acc,
+            'precision': precision,
+            'recall': recall,
+            'f1': f1,
+            'training_loss': history.history['loss'][-1],
+            'training_acc': history.history['accuracy'][-1],
+            'val_loss': history.history['val_loss'][-1],
+            'val_acc': history.history['val_accuracy'][-1],
+            'test_loss': test_loss,
+            'test_metric': test_metric
+        })
+        # Set a tag that we can use to remind ourselves what this run was for
+        mlflow.set_tags(tags)
+
         # Save model:
         signature = infer_signature(x_train, y_train)
         mlflow.tensorflow.log_model(model, output_path, signature=signature)
@@ -116,4 +116,4 @@ if __name__ == '__main__':
     data_path = config['data']['dataset_path']
 
     train(data_path, config['training']['num_epochs'],
-          config['training']['batch_size'], config['model_name'], config['training']['output_path'])
+          config['training']['batch_size'], config['training']['output_path'], config['mlflow']['tracking_uri'], config['mlflow']['experiment_name'], config['mlflow']['tags'])

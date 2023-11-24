@@ -19,10 +19,6 @@ if __name__ == '__main__':
     # Get parameters:
     data_path = config['data']['dataset_path']
 
-    # MLflow setup
-    mlflow.set_tracking_uri(config['mlflow']['mlruns_path'])
-    mlflow.set_experiment(config['mlflow']['experiment_name'])
-
     # Compute all possible combinations:
     params = config['hyperparameter_tuning']
     keys, values = zip(*params.items())
@@ -30,5 +26,6 @@ if __name__ == '__main__':
 
     # Train:
     for run in runs:
-        with mlflow.start_run():
-            train(data_path, run['num_epochs'], run['batch_size'])
+        train(data_path, run['num_epochs'], run['batch_size'], config['training']['output_path'],
+              config['mlflow']['tracking_uri'],
+              config['mlflow']['experiment_name'], config['mlflow']['tags'])
