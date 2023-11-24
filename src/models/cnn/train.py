@@ -92,9 +92,15 @@ def train(data_path, epochs, batch_size, model_name, output_path):
                 }
             }, f)
 
-    # Save model:
-    signature = infer_signature(x_train, y_train)
-    mlflow.tensorflow.log_model(model, output_path, signature=signature)
+    # Set tracking server uri for logging
+    mlflow.set_tracking_uri(config['mlflow']['tracking_uri'])
+    # Create an MLflow Experiment
+    mlflow.set_experiment(config['mlflow']['experiment_name'])
+    # Start an MLflow run
+    with mlflow.start_run():
+        # Save model:
+        signature = infer_signature(x_train, y_train)
+        mlflow.tensorflow.log_model(model, output_path, signature=signature)
 
 
 if __name__ == '__main__':
@@ -109,9 +115,5 @@ if __name__ == '__main__':
     # Get parameters:
     data_path = config['data']['dataset_path']
 
-    # MLflow setup
-    mlflow.set_experiment(config['mlflow']['experiment_name'])
-
-    with mlflow.start_run():
-        train(data_path, config['training']['num_epochs'],
-              config['training']['batch_size'], config['model_name'], config['training']['output_path'])
+    train(data_path, config['training']['num_epochs'],
+          config['training']['batch_size'], config['model_name'], config['training']['output_path'])

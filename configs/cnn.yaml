@@ -14,6 +14,7 @@ training:
 # Logging and output parameters
 mlflow:
   mlruns_path: 'models'
+  tracking_uri: 'http://localhost:8080'
   experiment_name: 'cnn'
 
 # Grid search:
