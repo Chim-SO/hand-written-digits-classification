@@ -105,7 +105,7 @@ def train(data_path, epochs, batch_size, output_path, tracking_uri, experiment_n
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Train a Keras CNN-based model for MNIST classification")
-    parser.add_argument("--config-file", "-c", type=str, default='configs/cnnbased.yaml')
+    parser.add_argument("--config-file", "-c", type=str, default='configs/cnn.yaml')
     args = parser.parse_args()
 
     # Load the configuration file:
