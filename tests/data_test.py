@@ -7,13 +7,24 @@ from src.models.cnn.dataloader import load_data
 
 
 def check_image_dimensions(dataset, dimension):
-    assert dataset.shape[1] == (dimension[0] * dimension[1]), f"Image dimensions do not match the expected shape : {dimension[0] * dimension[1]}"
+    assert dataset.shape[1] == (dimension[0] * dimension[
+        1]), f"Image dimensions do not match the expected shape : {dimension[0] * dimension[1]}"
     print(f"Checking images dimensions : {dimension[0] * dimension[1]} ... OK!")
 
 
 def check_y_dimensions(y, dimension):
     assert y.ndim == dimension, f"Labels dimensions do not match the expected dimension: {dimension}"
     print(f"Checking labels dimensions : {dimension} ... OK!")
+
+
+def check_pixel_values(dataset):
+    assert ((0 <= dataset) & (dataset <= 255)).all(), "pixels values are not within thee expected range"
+    print("Checking pixels values ... OK!")
+
+
+def check_y_values(y):
+    assert ((0 <= y) & (y <= 9)).all(), "labels values are not within thee expected range"
+    print("Checking labels values ... OK!")
 
 
 if __name__ == '__main__':
@@ -39,3 +50,7 @@ if __name__ == '__main__':
     check_image_dimensions(x_test, image_dimension)
     check_y_dimensions(y_train, y_dim)
     check_y_dimensions(y_test, y_dim)
+    check_pixel_values(x_train)
+    check_pixel_values(x_test)
+    check_y_values(y_train)
+    check_y_values(y_test)
