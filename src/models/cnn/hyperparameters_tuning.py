@@ -9,7 +9,7 @@ from train import train
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="Hyperparameter tuning of a Keras CNN-based model for MNIST classification")
-    parser.add_argument("--config-file", "-c", type=str, default='configs/cnnbased.yaml')
+    parser.add_argument("--config-file", "-c", type=str, default='configs/cnn.yaml')
     args = parser.parse_args()
 
     # Load the configuration file:
