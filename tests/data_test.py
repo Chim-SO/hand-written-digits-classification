@@ -17,7 +17,7 @@ def check_y_dimensions(y, dimension):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Train a Keras CNN-based model for MNIST classification")
+    parser = argparse.ArgumentParser(description="Data Testing ...")
     parser.add_argument("--config-file", "-c", type=str, default='configs/cnn.yaml')
     args = parser.parse_args()
 
