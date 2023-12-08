@@ -1,11 +1,16 @@
 # Configuration file for deep learning model
 # ------------------------------
 # Data parameters
-model_name : 'cnn'
+model:
+   name : 'cnn'
+   input_dim: [28, 28, 1]
+   output_dim: 10
+
 data:
   dataset_path : 'data/processed/'
   image_dimension: [28, 28, 1]
   label_dimension : 1
+
 
 # Training parameters
 training:
