@@ -1,3 +1,4 @@
+import numpy as np
 import tensorflow as tf
 from PIL import Image, ImageChops, ImageOps
 
@@ -8,7 +9,14 @@ def scale(data, factor=255):
 
 
 def reshape(data):
-    data = data.reshape((data.shape[0], 28, 28, 1))
+    data_shape = data.shape
+    if data_shape == (28, 28):
+        data = np.expand_dims(data, 0)
+        data = np.expand_dims(data, -1)
+    elif data_shape == (28, 28, 1):
+        data = np.expand_dims(data, 0)
+    else:
+        data = data.reshape((data.shape[0], 28, 28, 1))
     return data
 
 

@@ -5,12 +5,12 @@ import mlflow
 import numpy as np
 from PIL import Image
 
-from src.models.cnn.preprocessing import scale, trim, add_border
+from src.models.cnn.preprocessing import scale, trim, add_border, reshape
 
 os.environ["CUDA_VISIBLE_DEVICES"] = ""
 if __name__ == '__main__':
     # Load image:
-    im = Image.open("../../../data/external/test/3_0.png").convert('L')
+    im = Image.open("../../../data/external/tests/7_0.png").convert('L')
     # im.show()
 
     # Trim image:
@@ -25,15 +25,13 @@ if __name__ == '__main__':
     # Image preprocessing:
     x = 1 - np.array(im_res)
     x = scale(x)
-    x = np.expand_dims(x, 0)
-    x = np.expand_dims(x, -1)
+    x = reshape(x)
     print(x.shape)
 
     # Load model:
-    mlflow.set_tracking_uri('file:../../../mlruns')
-    logged_model = 'runs:/73c37b1939b14ed2968585b761f7c9cf/models/'
-    # Load model as a PyFuncModel.
-    loaded_model = mlflow.pyfunc.load_model(logged_model)
+    mlflow.set_tracking_uri('http://127.0.0.1:8080')
+    loaded_model = mlflow.pyfunc.load_model(
+        'mlflow-artifacts:/673114994354686159/6e143279eae147bdb90874389d4c2a24/artifacts/models')
 
     # Predict:
     y = np.argmax(loaded_model.predict(x), axis=1)[0]
@@ -49,4 +47,5 @@ if __name__ == '__main__':
     ax[2].set_title('Resized')
     ax[3].imshow(x.reshape((28, 28)), cmap='gray')
     ax[3].set_title('Preprocessed')
+    plt.savefig('sample_plot.png', bbox_inches='tight')
     plt.show()
