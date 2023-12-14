@@ -24,8 +24,8 @@ def onehot_encoding(feature, num_cat=10):
     return tf.keras.utils.to_categorical(feature, num_classes=num_cat)
 
 
-def trim(im):
-    bg = Image.new(im.mode, im.size, im.getpixel((0, 0)))
+def trim(im, color=255):
+    bg = Image.new(im.mode, im.size, color)
     diff = ImageChops.difference(im, bg)
     diff = ImageChops.add(diff, diff, 2.0, -100)
     bbox = diff.getbbox()
