@@ -30,22 +30,29 @@ if __name__ == '__main__':
 
     # Load model:
     mlflow.set_tracking_uri('http://127.0.0.1:8080')
-    loaded_model = mlflow.pyfunc.load_model(
-        'mlflow-artifacts:/673114994354686159/6e143279eae147bdb90874389d4c2a24/artifacts/models')
+    # Search for runs in the experiment and get the latest run
+    runs = mlflow.search_runs(experiment_ids=[mlflow.get_experiment_by_name('cnn').experiment_id], order_by=["start_time desc"])
 
-    # Predict:
-    y = np.argmax(loaded_model.predict(x), axis=1)[0]
+    if not runs.empty:
+        latest_run_id = runs.iloc[0]["run_id"]
+        # Load the model from the latest run
+        loaded_model = mlflow.pyfunc.load_model(f"runs:/{latest_run_id}/models")
 
-    # Print:
-    fig, ax = plt.subplots(1, 4)
-    fig.suptitle(f'Predicted: {y}')
-    ax[0].imshow(im, cmap='gray')
-    ax[0].set_title('Input')
-    ax[1].imshow(im_trim, cmap='gray')
-    ax[1].set_title('Trimmed')
-    ax[2].imshow(im_res, cmap='gray')
-    ax[2].set_title('Resized')
-    ax[3].imshow(x.reshape((28, 28)), cmap='gray')
-    ax[3].set_title('Preprocessed')
-    plt.savefig('sample_plot.png', bbox_inches='tight')
-    plt.show()
+        # Predict:
+        y = np.argmax(loaded_model.predict(x), axis=1)[0]
+
+        # Print:
+        fig, ax = plt.subplots(1, 4)
+        fig.suptitle(f'Predicted: {y}')
+        ax[0].imshow(im, cmap='gray')
+        ax[0].set_title('Input')
+        ax[1].imshow(im_trim, cmap='gray')
+        ax[1].set_title('Trimmed')
+        ax[2].imshow(im_res, cmap='gray')
+        ax[2].set_title('Resized')
+        ax[3].imshow(x.reshape((28, 28)), cmap='gray')
+        ax[3].set_title('Preprocessed')
+        plt.savefig('sample_plot.png', bbox_inches='tight')
+        plt.show()
+    else:
+        print("No runs found in the specified experiment.")
