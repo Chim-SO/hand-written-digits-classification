@@ -67,7 +67,7 @@ if __name__ == '__main__':
         config = yaml.safe_load(file)
 
     # Get parameters:
-    data_path = config['data']['dataset_path']
+    data_path = "../data/processed/"
     input_dim = config['model']['input_dim']
     y_dim = config['model']['output_dim']
     x_test, y_test = load_data(os.path.join(data_path, 'test.csv'))
@@ -76,10 +76,14 @@ if __name__ == '__main__':
     # Scaling:
     x_test_processed = scale(x_test)
 
+    # Predict:
+    y = np.argmax(model.predict(x_test_processed), axis=1)
+    indices_of_difference = np.where(y != y_test)
+    print(indices_of_difference)
+
     # Get the Grad-CAM heatmap
-    ind = 10
+    ind = 320
     img_array = np.expand_dims(x_test_processed[ind], 0)
-    print(img_array.shape)
     heatmap = get_grad_cam(model, img_array, 'conv2d_1')
 
     # Superimpose the heatmap on the original image
