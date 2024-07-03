@@ -47,41 +47,41 @@ def train(data_path, epochs, batch_size, output_path, tracking_uri, experiment_n
     loss = 'categorical_crossentropy'
     metric = 'accuracy'
 
-    # Train:
-    model.compile(loss=loss, optimizer='adam', metrics=[metric])
-    history = model.fit(x_train, y_train, epochs=epochs, batch_size=batch_size, verbose=1,
-                        validation_data=(x_val, y_val))
-
-    # Evaluation
-    x_test, y_test = load_data(os.path.join(data_path, 'test.csv'))
-    # Reshape:
-    x_test = reshape(x_test)
-    # Scaling:
-    x_test = scale(x_test)
-    # Encode the output:
-    y_test = onehot_encoding(y_test)
-
-    # evaluate and log:
-    test_loss, test_metric = model.evaluate(x_test, y_test, verbose=2)
-
-    # Other metric evaluation:
-    y_pred = np.argmax(model.predict(x_test), axis=1)
-    acc, precision, recall, f1 = eval_metrics(np.argmax(y_test, axis=1), y_pred)
-
-
     # Set tracking server uri for logging
     mlflow.set_tracking_uri(tracking_uri)
     # Create an MLflow Experiment
     mlflow.set_experiment(experiment_name)
     # Start an MLflow run
     with mlflow.start_run():
+        mlflow.autolog()
+        
+        # Train:
+        model.compile(loss=loss, optimizer='adam', metrics=[metric])
+        history = model.fit(x_train, y_train, epochs=epochs, batch_size=batch_size, verbose=1,
+                            validation_data=(x_val, y_val))
+
+        # Evaluation
+        x_test, y_test = load_data(os.path.join(data_path, 'test.csv'))
+        # Reshape:
+        x_test = reshape(x_test)
+        # Scaling:
+        x_test = scale(x_test)
+        # Encode the output:
+        y_test = onehot_encoding(y_test)
+
+        # evaluate and log:
+        test_loss, test_metric = model.evaluate(x_test, y_test, verbose=2)
+
+        # Other metric evaluation:
+        y_pred = np.argmax(model.predict(x_test), axis=1)
+        acc, precision, recall, f1 = eval_metrics(np.argmax(y_test, axis=1), y_pred)
+
         # Log the hyperparameters
         mlflow.log_params({
             'loss': loss,
             'metric': metric,
-            'epochs': epochs,
-            'batch_size': batch_size
         })
+
         # Log the metrics
         mlflow.log_metrics({
             'acc': acc,
@@ -95,6 +95,7 @@ def train(data_path, epochs, batch_size, output_path, tracking_uri, experiment_n
             'test_loss': test_loss,
             'test_metric': test_metric
         })
+        
         # Set a tag that we can use to remind ourselves what this run was for
         mlflow.set_tags(tags)
 
