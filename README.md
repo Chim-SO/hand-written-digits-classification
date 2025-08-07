@@ -1,6 +1,6 @@
 # Hand written digits classification:
 This Repo serves as a demo of the workflow, principals and bestt practice of MLOps.  
-You can find the tutorials on my Medium Profile: <a target="_blank" href="https://medium.com/@chimso1994">Chayma Zatout (@chimso1994)</a>.
+You can find the tutorials on my Medium Profile: <a target="_blank" href="https://medium.com/@Chim-SO">Chayma Zatout (@Chim-SO)</a>.
 
 
 --------
